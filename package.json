@@ -1,0 +1,23 @@
+{
+  "name": "telegramer",
+  "version": "1.0.0",
+  "description": "Telegram sub-bot service",
+  "main": "src/main.ts",
+  "repository": "https://github.com/b4ck5p4c3/telegramer",
+  "author": "radioegor146",
+  "license": "MIT",
+  "scripts": {
+    "start": "ts-node src/main.ts"
+  },
+  "dependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^22.5.5",
+    "axios": "^1.7.7",
+    "body-parser": "^1.20.3",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0",
+    "ts-node": "^10.9.2",
+    "tslog": "^4.9.3",
+    "typescript": "^5.6.2"
+  }
+}
