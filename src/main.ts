@@ -112,7 +112,8 @@ privateEndpoint.use(`/bot${STUB_BOT_TOKEN}/:method`, (req, res, next) => {
         method: req.method,
         data: req,
         responseType: "stream",
-        headers: requestHeaders
+        headers: requestHeaders,
+        validateStatus: () => true
     }).then(response => {
         res.status(response.status);
         for (const header of proxifiedResponseHeaders) {
