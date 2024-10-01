@@ -6,7 +6,7 @@ On any webhook request, it sends webhook data to all sub-bots, and on reply it j
 
 ## Environment
 - `TELEGRAM_BOT_TOKEN` - Telegram Bot token
-- `TELEGRAM_BOT_API_SECRET_TOKEN` - `X-Telegram-Bot-Api-Secret-Token` for webhooks
+- `PUBLIC_ENDPOINT_URL` - URL for Telegram API setWebhook (should proxy to `/` of `PUBLIC_ENDPOINT_PORT`)
 - `PUBLIC_ENDPOINT_PORT` - Port of public (webhook receiver) endpoint
 - `PRIVATE_ENDPOINT_PORT` - Port of private (Telegram API proxy) endpoint
 - `SUB_BOTS` - List of sub-bot endpoints (POST of webhooks)

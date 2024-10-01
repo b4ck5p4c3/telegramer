@@ -4,6 +4,7 @@ import {env} from "./helper";
 import bodyParser from "body-parser";
 import {getLogger} from "./logger";
 import axios from "axios";
+import {randomBytes} from "node:crypto";
 
 dotenv.config({
     path: ".env.local"
@@ -15,11 +16,13 @@ dotenv.config({
 const logger = getLogger();
 
 const PUBLIC_ENDPOINT_PORT = parseInt(env("PUBLIC_ENDPOINT_PORT", "3000"));
+const PUBLIC_ENDPOINT_URL = env("PUBLIC_ENDPOINT_URL");
 const PRIVATE_ENDPOINT_PORT = parseInt(env("PRIVATE_ENDPOINT_PORT", "3001"));
 const TELEGRAM_BOT_TOKEN = env("TELEGRAM_BOT_TOKEN");
-const TELEGRAM_BOT_API_SECRET_TOKEN = env("TELEGRAM_BOT_API_SECRET_TOKEN");
 const SUB_BOTS = env("SUB_BOTS", "").split(",").filter(url => url);
 const STUB_BOT_TOKEN = env("STUB_BOT_TOKEN", "1337008:B4CKSP4CEB4CKSP4CEB4CKSP4CEB4CKSP4C");
+
+const secretToken = randomBytes(32).toString("hex");
 
 const publicEndpoint = express();
 publicEndpoint.use(bodyParser.json());
@@ -55,7 +58,7 @@ async function sendToAllSubBots(data: object): Promise<void> {
 publicEndpoint.post("/", (req, res) => {
     res.status(200).end();
 
-    if (req.header("X-Telegram-Bot-Api-Secret-Token") !== TELEGRAM_BOT_API_SECRET_TOKEN) {
+    if (req.header("X-Telegram-Bot-Api-Secret-Token") !== secretToken) {
         return;
     }
 
@@ -128,9 +131,19 @@ privateEndpoint.use(`/bot${STUB_BOT_TOKEN}/:method`, (req, res, next) => {
     });
 });
 
-publicEndpoint.listen(PUBLIC_ENDPOINT_PORT, () => {
-    logger.info(`Public endpoint listening on :${PUBLIC_ENDPOINT_PORT}`);
-});
-privateEndpoint.listen(PRIVATE_ENDPOINT_PORT, () => {
-    logger.info(`Private endpoint listening on :${PRIVATE_ENDPOINT_PORT}`);
-})
+(async () => {
+    logger.info(`Starting, registering global webhook at '${PUBLIC_ENDPOINT_URL}' with secret_token: ${secretToken}`);
+
+    await axios.post(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/setWebhook`, {
+        url: PUBLIC_ENDPOINT_URL,
+        secret_token: secretToken
+    });
+
+    publicEndpoint.listen(PUBLIC_ENDPOINT_PORT, () => {
+        logger.info(`Public endpoint listening on :${PUBLIC_ENDPOINT_PORT}`);
+    });
+    privateEndpoint.listen(PRIVATE_ENDPOINT_PORT, () => {
+        logger.info(`Private endpoint listening on :${PRIVATE_ENDPOINT_PORT}`);
+    });
+})().catch(console.error);
+
