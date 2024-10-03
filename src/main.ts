@@ -34,15 +34,11 @@ async function sendToAllSubBots(data: object): Promise<void> {
     for (const subBotUrl of SUB_BOTS) {
         const responsePromise = (async () => {
             try {
-                const response = await fetch(subBotUrl, {
-                    method: "POST",
-                    body: JSON.stringify(data),
-                    headers: {
-                        "Content-Type": "application/json"
-                    }
+                const response = await axios.post(subBotUrl, data, {
+                    responseType: "text"
                 });
                 if (response.status !== 200) {
-                    logger.error(`Subbot '${subBotUrl}' replied with non-200 error: ${response.status} ${await response.text()}`);
+                    logger.error(`Subbot '${subBotUrl}' replied with non-200 error: ${response.status} ${response.data}`);
                 }
             } catch (e) {
                 logger.error(`Failed to send request to subbot '${subBotUrl}': ${e}`);
