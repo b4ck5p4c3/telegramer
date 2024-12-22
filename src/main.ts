@@ -81,6 +81,38 @@ const proxifiedResponseHeaders = [
     "transfer-encoding"
 ];
 
+async function proxyRequest(fullUrl: URL, req: express.Request, res: express.Response): Promise<void> {
+    const requestHeaders: Record<string, string> = {};
+    for (const header of proxifiedRequestHeaders) {
+        if (!req.headers[header]) {
+            continue;
+        }
+        requestHeaders[header] = String(req.headers[header]);
+    }
+
+    const response = await axios.request({
+        url: fullUrl.toString(),
+        method: req.method,
+        data: req,
+        responseType: "stream",
+        headers: requestHeaders,
+        validateStatus: () => true
+    });
+    res.status(response.status);
+    for (const header of proxifiedResponseHeaders) {
+        if (response.headers[header]) {
+            res.header(header, response.headers[header]);
+        }
+    }
+    const dataStream = response.data;
+    dataStream.pipe(res);
+}
+
+privateEndpoint.use(`/file/bot${STUB_BOT_TOKEN}/:file`, (req, res, next) => {
+    const fullUrl = new URL(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/${req.params.file}`);
+    proxyRequest(fullUrl, req, res).catch(e => next(e));
+});
+
 privateEndpoint.use(`/bot${STUB_BOT_TOKEN}/:method`, (req, res, next) => {
     const method = req.params.method;
     if (method === "setWebhook") {
@@ -98,33 +130,7 @@ privateEndpoint.use(`/bot${STUB_BOT_TOKEN}/:method`, (req, res, next) => {
         fullUrl.searchParams.set(key, String(value));
     }
 
-    const requestHeaders: Record<string, string> = {};
-    for (const header of proxifiedRequestHeaders) {
-        if (!req.headers[header]) {
-            continue;
-        }
-        requestHeaders[header] = String(req.headers[header]);
-    }
-
-    axios.request({
-        url: fullUrl.toString(),
-        method: req.method,
-        data: req,
-        responseType: "stream",
-        headers: requestHeaders,
-        validateStatus: () => true
-    }).then(response => {
-        res.status(response.status);
-        for (const header of proxifiedResponseHeaders) {
-            if (response.headers[header]) {
-                res.header(header, response.headers[header]);
-            }
-        }
-        const dataStream = response.data;
-        dataStream.pipe(res);
-    }).catch(e => {
-        next(e);
-    });
+    proxyRequest(fullUrl, req, res).catch(e => next(e));
 });
 
 (async () => {
