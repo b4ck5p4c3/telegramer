@@ -108,7 +108,7 @@ async function proxyRequest(fullUrl: URL, req: express.Request, res: express.Res
     dataStream.pipe(res);
 }
 
-privateEndpoint.use(`/file/bot${STUB_BOT_TOKEN}/:file(*)`, (req, res, next) => {
+privateEndpoint.use(`/file/bot${STUB_BOT_TOKEN}/:file`, (req, res, next) => {
     const fullUrl = new URL(`https://api.telegram.org/file/bot${TELEGRAM_BOT_TOKEN}/${req.params.file}`);
     proxyRequest(fullUrl, req, res).catch(e => next(e));
 });

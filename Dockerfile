@@ -1,7 +1,7 @@
-FROM node:21-alpine
-WORKDIR /app/
-COPY package.json package.json
-COPY yarn.lock yarn.lock
-RUN yarn --frozen-lockfile
+FROM node:25-slim
+ENV NODE_ENV=production
+RUN ["npm", "install", "-g", "pnpm@latest-10"]
+COPY ./package.json ./pnpm-lock.yaml ./
+RUN ["pnpm", "install", "--frozen-lockfile"]
 COPY . .
-CMD yarn start
+CMD ["pnpm", "run", "start"]
