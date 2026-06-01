@@ -124,6 +124,7 @@ privateEndpoint.use(`/bot${STUB_BOT_TOKEN}/:method`, (req, res, next) => {
         });
         return;
     }
+    console.info(method);
 
     const fullUrl = new URL(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/${method}`);
     for (const [key, value] of Object.entries(req.query)) {
