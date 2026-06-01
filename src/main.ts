@@ -115,16 +115,15 @@ privateEndpoint.use(`/file/bot${STUB_BOT_TOKEN}/:file`, (req, res, next) => {
 
 privateEndpoint.use(`/bot${STUB_BOT_TOKEN}/:method`, (req, res, next) => {
     const method = req.params.method;
-    if (method === "setWebhook") {
-        logger.warn("Subbot tried to set webhook")
+    if (method === "setWebhook" || method === "deleteWebhook") {
+        logger.warn("Subbot tried to set/delete webhook")
         res.status(200).json({
             ok: true,
             result: true,
-            description: "Webhook was set"
+            description: "Webhook was set or delete"
         });
         return;
     }
-    console.info(method);
 
     const fullUrl = new URL(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/${method}`);
     for (const [key, value] of Object.entries(req.query)) {
