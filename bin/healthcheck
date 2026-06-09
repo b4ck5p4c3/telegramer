@@ -1,0 +1,10 @@
+#!/usr/bin/env node
+
+const port = parseInt(process.env.PRIVATE_ENDPOINT_PORT ?? '3000', 10)
+const request = await fetch(`http://localhost:${port}/healthz`)
+
+if (request.ok) {
+  process.exit(0)
+} else {
+  process.exit(1)
+}
