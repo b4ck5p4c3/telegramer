@@ -133,6 +133,18 @@ privateEndpoint.use(`/bot${STUB_BOT_TOKEN}/:method`, (req, res, next) => {
     proxyRequest(fullUrl, req, res).catch(e => next(e));
 });
 
+/**
+ * Health check endpoints.
+ * As Telegramer don't have any hard-deps, we can just return 200 OK.
+ */
+privateEndpoint.get("/healthz", (req, res) => {
+    res.status(200).end();
+});
+
+publicEndpoint.get("/healthz", (req, res) => {
+    res.status(200).end();
+});
+
 (async () => {
     logger.info(`Starting, registering global webhook at '${PUBLIC_ENDPOINT_URL}' with secret_token: ${secretToken}`);
 
