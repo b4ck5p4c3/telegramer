@@ -108,8 +108,9 @@ async function proxyRequest(fullUrl: URL, req: express.Request, res: express.Res
     dataStream.pipe(res);
 }
 
-privateEndpoint.use(`/file/bot${STUB_BOT_TOKEN}/:file`, (req, res, next) => {
-    const fullUrl = new URL(`https://api.telegram.org/file/bot${TELEGRAM_BOT_TOKEN}/${req.params.file}`);
+privateEndpoint.use(`/file/bot${STUB_BOT_TOKEN}/*file`, (req, res, next) => {
+    const filePath = Array.isArray(req.params.file) ? req.params.file.join("/") : req.params.file;
+    const fullUrl = new URL(`https://api.telegram.org/file/bot${TELEGRAM_BOT_TOKEN}/${filePath}`);
     proxyRequest(fullUrl, req, res).catch(e => next(e));
 });
 
