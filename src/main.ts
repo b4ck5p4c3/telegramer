@@ -5,6 +5,7 @@ import bodyParser from "body-parser";
 import {getLogger} from "./logger";
 import axios from "axios";
 import {randomBytes} from "node:crypto";
+import {ALLOWED_UPDATES} from "./allowed-updates";
 
 dotenv.config({
     path: ".env.local"
@@ -116,7 +117,8 @@ privateEndpoint.use(`/file/bot${STUB_BOT_TOKEN}/*file`, (req, res, next) => {
 
 privateEndpoint.use(`/bot${STUB_BOT_TOKEN}/:method`, (req, res, next) => {
     const method = req.params.method;
-    if (method === "setWebhook" || method === "deleteWebhook") {
+    const normalizedMethod = String(method).toLowerCase();
+    if (normalizedMethod === "setwebhook" || normalizedMethod === "deletewebhook") {
         logger.warn("Subbot tried to set/delete webhook")
         res.status(200).json({
             ok: true,
@@ -151,7 +153,8 @@ publicEndpoint.get("/healthz", (req, res) => {
 
     await axios.post(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/setWebhook`, {
         url: PUBLIC_ENDPOINT_URL,
-        secret_token: secretToken
+        secret_token: secretToken,
+        allowed_updates: ALLOWED_UPDATES
     });
 
     publicEndpoint.listen(PUBLIC_ENDPOINT_PORT, () => {

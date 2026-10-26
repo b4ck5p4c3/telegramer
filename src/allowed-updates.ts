@@ -1,0 +1,31 @@
+// All Update types in Telegram Bot API 10.3: https://core.telegram.org/bots/api#update
+// An empty list excludes chat_member, message_reaction and message_reaction_count.
+export const ALLOWED_UPDATES = [
+    "message",
+    "edited_message",
+    "channel_post",
+    "edited_channel_post",
+    "business_connection",
+    "business_message",
+    "edited_business_message",
+    "deleted_business_messages",
+    "guest_message",
+    "message_reaction",
+    "message_reaction_count",
+    "inline_query",
+    "chosen_inline_result",
+    "callback_query",
+    "shipping_query",
+    "pre_checkout_query",
+    "purchased_paid_media",
+    "poll",
+    "poll_answer",
+    "my_chat_member",
+    "chat_member",
+    "chat_join_request",
+    "chat_boost",
+    "removed_chat_boost",
+    "managed_bot",
+    "subscription",
+    "stopped_message_generation"
+] as const;
